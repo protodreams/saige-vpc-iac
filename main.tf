@@ -10,14 +10,14 @@ variable "environment" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name   = "saige_vpc"
-  region = "us-east-2"
+  name   = "saige-vpc"
+  region = "us-east-1"
 
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
-    Example = local.name
+     Name= local.name
   }
 }
 
@@ -52,6 +52,10 @@ module "vpc" {
 
   enable_dns_hostnames = true
   enable_dns_support   = true
+}
+
+output "vpc_private_subnet_ids" {
+  value = module.vpc.private_subnets[0]
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -94,7 +98,7 @@ resource "aws_vpc_endpoint" "s3" {
 }
 
 resource "aws_security_group" "saige_vpc_sg" {
-  name        = "saige_vpc_sg"
+  name        = "saige-vpc-sg"
   description = "Default Security Group for connecting from prem to cloud"
   vpc_id      = module.vpc.vpc_id
 
@@ -114,4 +118,12 @@ resource "aws_security_group" "saige_vpc_sg" {
     protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "saige-vpc-sg"
+  }
+}
+
+output "saige_vpc_sg_id" {
+  value = aws_security_group.saige_vpc_sg.id
 }

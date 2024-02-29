@@ -58,6 +58,10 @@ output "vpc_private_subnet_ids" {
   value = module.vpc.private_subnets[0]
 }
 
+output "vpc_public_subnet_ids" {
+  value = module.vpc.public_subnets[0]
+}
+
 resource "aws_nat_gateway" "nat" {
   subnet_id = module.vpc.public_subnets[0]
   allocation_id = aws_eip.nat_eip.id

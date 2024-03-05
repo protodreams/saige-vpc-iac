@@ -19,3 +19,15 @@ variable "ingress_ports" {
     }
   ]
 }
+
+ variable "bastion_type" {
+      description = "The ec2 type for development with a bastion"
+      type = string
+      default = "t2.micro"
+ }
+ 
+  variable "bastion_ami" {
+     description = "The ami for development with a bastion"
+     type = string
+     default = "ami-0440d3b780d96b29d"
+ }

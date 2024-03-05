@@ -131,3 +131,36 @@ resource "aws_security_group" "saige_vpc_sg" {
 output "saige_vpc_sg_id" {
   value = aws_security_group.saige_vpc_sg.id
 }
+
+data "aws_subnets" public_subnets {
+  filter {
+    name   = "vpc-id"
+    values = [module.vpc.vpc_id]
+  }
+  tags = {
+    Name = "Public Subnet*"
+  }
+}
+
+
+# install a bastion host
+resource "aws_instance" "bastion-host" {
+  ami = var.bastion_ami
+  instance_type = var.bastion_type
+  subnet_id = data.aws_subnets.public_subnets.ids[0]
+  security_groups = [aws_security_group.saige_vpc_sg.id]
+  key_name = "saige-dev"
+  associate_public_ip_address = true
+  # count = var.environment == "bastion" ? 1:0
+   tags = {
+      Name = "Bastion Host"
+  }
+}
+
+output "bastion-host" {
+  value = aws_instance.bastion-host.public_dns
+
+  depends_on = [
+    aws_instance.bastion-host
+  ]
+}
